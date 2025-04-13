@@ -4,73 +4,116 @@
 - RM555992 – Cristiano Washington Dias  
 - RM558108 – Thiago Almança da Silva  
 
-## 📌 Objetivo
-Desenvolver um modelo de classificação para prever a resposta dos clientes a campanhas promocionais da empresa iFood, utilizando a biblioteca **PyCaret** com foco na métrica **AUC (Área sob a Curva ROC)**.
+## 🎯 Objetivo
+Aprimorar modelos de classificação para prever a resposta dos clientes às campanhas promocionais da empresa iFood, utilizando a biblioteca **PyCaret** com foco na métrica **AUC (Área sob a Curva ROC)**.
 
 ---
 
 ## ⚙️ Etapas Realizadas
 
-1. **Importação e limpeza de dados**  
-   - Remoção de colunas irrelevantes e amostras com `NaN`
-   - Conversão de tipos de dados
+1. **Importação e limpeza de dados**
+   - Remoção de colunas irrelevantes e valores ausentes
+   - Conversão de tipos e normalização de categorias
 
-2. **Criação de novas features**  
-   - `Total_Spent`: soma de todos os produtos adquiridos  
-   - `Age_Group`: faixa etária do cliente  
-   - `Avg_Spent_per_Month`: gasto médio mensal  
+2. **Criação de novas features**
+   - `Total_Spent`: soma dos produtos adquiridos
+   - `Age_Group`: faixa etária categorizada
+   - `Avg_Spent_per_Month`: média de gastos por mês
+   - `Total_Children`: soma de `Kidhome` e `Teenhome`
+   - `Total_Purchases`: soma de compras web, catálogo e loja
+   - `Income_per_Person`: renda dividida por número de dependentes
 
-3. **Split dos dados**  
-   - 95% treino + 5% conjunto de validação (`df_valid`)
+3. **Divisão dos dados**
+   - 95% para treino/teste (`df_train_test`) e 5% para validação (`df_valid`)
 
-4. **Setup do PyCaret**  
-   - Remoção de outliers, normalização e seleção de features  
-   - Correção de desbalanceamento com **SMOTE**
-
-5. **Comparação entre modelos (`compare_models`)**  
-   - Melhor AUC obtido com `Logistic Regression` (0.834)
-
-6. **Tuning do modelo (`tune_model`)**  
-   - Leve ajuste nos parâmetros com melhoria de estabilidade
-
-7. **Avaliação visual (`plot_model`)**  
-   - Curva ROC, Matriz de confusão e Feature Importance
-
-8. **Validação final (`predict_model` com `df_valid`)**  
-   - Resultado: AUC = **0.6484** no conjunto de validação
+4. **Modelagem com PyCaret**
+   - Aplicação de `setup()` com seleção de features, balanceamento e normalização
+   - Comparação entre modelos com `compare_models()`
+   - Tunagem com `tune_model()` para otimização da AUC
+   - Avaliação gráfica com `plot_model()`
+   - Predição no conjunto de validação com `predict_model()`
 
 ---
 
-## 📈 Modelo Final
+## 🧪 Evolução dos Modelos Testados
 
-- **Modelo:** Logistic Regression (tune_model)  
-- **AUC (treino):** 0.8344  
-- **AUC (validação):** 0.6484  
-- **Features mais relevantes:**  
-  - `Recency`, `Time_Customer`, `MntMeatProducts`, `Total_Spent`, `Avg_Spent_per_Month`
+### 1. **Regressão Logística (baseline)**
+
+| Métrica   | Valor   |
+|-----------|---------|
+| AUC       | 0.6484  |
+| Recall    | 0.5714  |
+| F1-score  | 0.2712  |
+
+➡️ Modelo inicial, interpretável, porém com desempenho limitado.
+
+---
+
+### 2. **Random Forest (v1)**
+
+| Métrica   | Valor   |
+|-----------|---------|
+| AUC       | 0.8388  |
+| Recall    | 0.5411  |
+| F1-score  | 0.4866  |
+
+➡️ Modelo mais robusto, com melhora significativa sobre o baseline.
+
+---
+
+### 3. **LightGBM Tunado (modelo final)**
+
+| Métrica   | Valor   |
+|-----------|---------|
+| **AUC**   | **0.8880** ✅ |
+| Recall    | 0.7143  |
+| F1-score  | 0.5263  |
+| Accuracy  | 0.8364  |
+
+➡️ Modelo final escolhido, com excelente equilíbrio entre AUC e métricas de classificação.
+
+---
+
+## 📊 Comparativo com o modelo original (Random Forest)
+
+| Modelo                | AUC     | F1     | Recall | Accuracy |
+|-----------------------|---------|--------|--------|----------|
+| Modelo Original (RF)  | 0.8983  | 0.4768 | 0.3789 | 0.8746   |
+| Nosso Final (LightGBM Tunado) | **0.8880**  | **0.5263** | **0.7143** | 0.8364   |
+
+> Embora a AUC do modelo original ainda seja ligeiramente superior, nosso modelo entrega um **Recall muito maior**, além de **F1 e precisão mais equilibradas**, sendo mais indicado para campanhas com foco em alcance de público engajado.
+
+---
+
+## 📈 Exemplo de Previsões
+
+| prediction_label | prediction_score |
+|------------------|------------------|
+| 0                | 0.8866           |
+| 0                | 0.8744           |
+| 0                | 0.8980           |
+| 0                | 0.9642           |
+| 1                | 0.6416           |
+
+---
+
+## 🔍 Possíveis Melhorias Futuras
+
+- Explorar modelos com tuning por `optuna` ou `bayesian optimization`
+- Realizar **feature selection manual** com análise de SHAP/Permutação
+- Implementar **validação temporal** para cenários reais
+- Integrar com estratégias de marketing direto segmentado
 
 ---
 
 ## 🔗 Links
 
 - 📓 Notebook no Colab: [Acessar](https://colab.research.google.com/drive/1Tl3wDeVi_1gYCofGjFRZi0TzNDA-n8bI?usp=sharing)  
-- 🐙 Repositório no GitHub: [Acessar](https://github.com/criswd/checkpoint-ifood-pycaret/)  
-
----
-
-## 🧪 Resultado exemplo
-
-| prediction_label | prediction_score |
-|------------------|------------------|
-| 0                | 0.7464           |
-| 1                | 0.8104           |
-| 0                | 0.8992           |
-| 0                | 0.8164           |
-| 1                | 0.9808           |
+- 🐙 Repositório no GitHub: [Acessar](https://github.com/criswd/checkpoint-ifood-pycaret/)
 
 ---
 
 ## ▶️ Como Executar
 1. Acesse o notebook via Google Colab
-2. Instale as dependências (`!pip install pycaret`)
+2. Instale o PyCaret: `!pip install pycaret`
 3. Execute célula por célula para replicar o experimento
